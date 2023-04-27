@@ -1,0 +1,44 @@
+version: '3'
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: persons
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+  api: 
+    build: 
+      context: ./backend
+    container_name: api
+    ports: 
+      - "3000:3000"
+  ui: 
+    build: 
+      context: ./frontend
+    container_name: ui
+    ports: 
+      - "4200:4200"
+  nginx: 
+    container_name: nginx
+    depends_on: 
+      - ui
+      - api
+    ports: 
+      - "80:80"
+    build:
+      context: ./nginx
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:
